@@ -18,26 +18,28 @@ log = [];
 bottle = function() {
 	var _ping = new RegExp(/^PING :/), 
 	_connected = new RegExp(/^.*MODE.*\+iw$/m),
-	irc = this.con = net.createConnection(port, server),
+
+	irc = this.connection = net.createConnection(port, server),
+
 	self = this;
 
-	irc.on("error", function(error) {
+	this.connection.on("error", function(error) {
 		console.log(error)
 	});
 
-	irc.on("connect", function() {
-		this.write("NICK " + nick + "\n");
-		this.write("USER bottle 8 * :" + username + "\n");
+	this.connection.on("connect", function() {
+		this.write("NICK " + nick + "\r");
+		this.write("USER bottle 8 * :" + username + "\r");
 	});
 
-	irc.on("data", function(data) {
-		text = data.toString();
+	this.connection.on("data", function(data) {
+		var text = data.toString();
 
-		if (_ping.test(text)) this.write(text.replace(/:/g, "") + "\n");
+		if (_ping.test(text)) this.write(text.replace(/:/g, "") + "\r");
 
 		else if (_connected.test(text)) for (i = 0; i < channels.length; i++) {
-			this.write("JOIN " + channels[i] + "\n");
-			self.say(channels[i], "Howdy ho \n");
+			this.write("JOIN " + channels[i] + "\r");
+			self.say(channels[i], "Howdy ho \r");
 		}
 
 		else {
@@ -74,19 +76,29 @@ bottle = function() {
 
 			case 'JOIN':
 				if (admins.indexOf(user) != - 1) {
-					this.con.write("MODE #" + msg.slice(1, msg.length) + " +o " + user + "\n");
+					self.op(msg.slice(1,msg.length), [ user ]);
 				}
 				break;
 
 			case '352':
 				break;
 			}
-			console.log(input);
 		}
+
+			console.log(input);
 	}
 
 	this.say = function(channel, something) {
-		this.con.write("PRIVMSG " + channel + " :" + something + "\n");
+		this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
+	}
+
+	this.op = function(channel, somefolks) {
+		var cmd = "MODE #" + channel + " +",
+		mode = "";
+		for (i = 0; i < somefolks.length; i++) {
+			mode += "o";
+		}
+		this.connection.write(cmd + mode + " " + somefolks.join(" ") + "\r");
 	}
 };
 
@@ -102,12 +114,12 @@ stdin.on("keypress", function(chunk, key) {
 	}
 
 	if (key && key.name == "enter") {
-		bot.con.write(buffer + "\n");
+		bot.connection.write(buffer + "\r");
 		buffer = "";
 	}
 
 	if (key && key.name == "f3") {
-		bot.say(channels[0], buffer + "\n");
+		bot.say(channels[0], buffer + "\r");
 		console.log(channels[0] + " <bot> " + buffer);
 		buffer = "";
 	}
