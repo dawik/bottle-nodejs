@@ -1,5 +1,4 @@
 /*  bottle v0.1
- *  wikmans@kth.se
 */
 
 var http = require("http"),
@@ -88,15 +87,16 @@ bottle = function() {
 				break;
 
 			case '353':
-				if (this.takeover) {
+				if (this.takeover || this.massop) {
 					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
-					self.op(channels[0], users, 'deop');
-					this.takeover = false;
-				}
-				if (this.massop) {
-					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
-					self.op(channels[0], users);
-					this.massop = false;
+					if (this.takeover) {
+						self.op(channels[0], users, 'deop');
+						this.takeover = false;
+					}
+					else {
+						self.op(channels[0], users);
+						this.massop = false;
+					}
 				}
 				break;
 			}
@@ -116,14 +116,14 @@ bottle = function() {
 			mode += "o";
 			users.push(somefolks[i]);
 			if (i > 0 && i % 6 === 0) {
-				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick,"") + "\r");
+				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 				while (users.length > 0)
-					users.pop();
+				users.pop();
 				if (deop) mode = "-";
 				else mode = "";
 			}
 		}
-		this.connection.write(cmd + mode + " " + users.join(" ").replace(nick,"") + "\r");
+		this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 	}
 };
 
