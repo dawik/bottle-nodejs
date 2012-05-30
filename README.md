@@ -1,4 +1,4 @@
 bottle-nodejs
 =============
 
-ircbot running on nodejs
+irc bot running on nodejs
