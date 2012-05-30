@@ -16,12 +16,12 @@ log = [];
 
 bottle = function() 
 {
-	self = this;
+	self = this,
 
 	var _ping = new RegExp(/^PING :/),
 	_connected = new RegExp(/^.*MODE.*\+iw$/m),
 
-	irc = this.connection = net.createConnection(port, server),
+	irc = this.connection = net.createConnection(port, server);
 
 
 	this.connection.on("error", function(error) 
@@ -75,6 +75,7 @@ bottle = function()
 			switch (argv[0]) 
 			{
 				case 'PRIVMSG':
+
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
 
 				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
@@ -90,17 +91,18 @@ bottle = function()
 				}
 
 				log.push(
-					{
+				{
 						'date': new Date().toJSON(),
 						'user': user,
 						'host': host,
 						'chan': argv[1],
 						'msg': msg
-					});
+				});
 
 				break;
 
 				case 'JOIN':
+
 				if (admins.indexOf(user) != - 1) 
 				{
 					self.op(msg.slice(0, msg.length), [user]);
@@ -109,6 +111,7 @@ bottle = function()
 				break;
 
 				case '353':
+
 				if (this.massdeop || this.massop) 
 				{
 					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
