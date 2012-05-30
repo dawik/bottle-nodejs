@@ -2,23 +2,23 @@
  *  wikmans@kth.se
 */
 
-var http = require("http");
-var net = require("net");
-var util = require("util");
+var http = require("http"),
+net = require("net"),
+util = require("util"),
 
-var admins = ["davve"];
-var nick = "bottle";
-var username = "Bottle beta bot";
-var channels = ["#testor1", "#testor2"];
-var server = "irc.freequest.net";
-var port = 6667;
+admins = ["davve"],
+nick = "bottle2",
+username = "Bottle beta bot",
+channels = ["#testor1", "#testor2"],
+server = "irc.freequest.net",
+port = 6667,
 
-var log = [];
+log = [];
 
 bottle = function() {
-	var _ping = new RegExp(/^PING :/)
-	var _connected = new RegExp(/^.*MODE.*\+iw$/m)
-	irc = this.con = net.createConnection(port, server);
+	var _ping = new RegExp(/^PING :/), 
+	_connected = new RegExp(/^.*MODE.*\+iw$/m),
+	irc = this.con = net.createConnection(port, server),
 	self = this;
 
 	irc.on("error", function(error) {
@@ -50,13 +50,12 @@ bottle = function() {
 		if (input.charAt(0) == ':') {
 			prefix = input.slice(1, input.search(/ /) - 1);
 			if (prefix.match(/@/)) {
-				user = prefix.slice(0, prefix.search(/!/));
-				host = prefix.slice(prefix.search(/!/) + 1);
+				var user = prefix.slice(0, prefix.search(/!/)),
+				host = prefix.slice(prefix.search(/!/) + 1),
 				msg = input.slice(input.search(/ :/) + 2, input.length - 2);
-				console.log(msg);
 			}
-			var commands = input.slice(input.search(/ /) + 1, input.search(/ :/));
-			var argv = commands.split(" ");
+			var commands = input.slice(input.search(/ /) + 1, input.search(/ :/)),
+			argv = commands.split(" ");
 			console.log(argv);
 		}
 
@@ -94,8 +93,8 @@ bottle = function() {
 var bot = new bottle();
 
 /* For debug purposes */
-var buffer = "";
-var stdin = process.openStdin();
+var buffer = "",
+stdin = process.openStdin();
 require("tty").setRawMode(true);
 stdin.on("keypress", function(chunk, key) {
 	if (chunk) {
