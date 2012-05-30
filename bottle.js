@@ -158,7 +158,7 @@ bottle = function()
 				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 
 				while (users.length > 0)
-				users.pop();
+					users.pop();
 
 				if (deop) mode = "-";
 				else mode = "+";
