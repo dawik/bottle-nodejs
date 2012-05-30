@@ -67,84 +67,84 @@ bottle = function()
 		argv = commands.split(" ");
 	}
 
-	if (argv) 
-	{
-		switch (argv[0]) 
+		if (argv) 
 		{
-			case 'PRIVMSG':
-				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
-				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
-				{
-					this.massdeop = true;
-					this.connection.write("NAMES " + argv[1] + "\r");
-				}
-				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
-				{
-					this.massop = true;
-					this.connection.write("NAMES " + argv[1] + "\r");
-				}
-				log.push(
+			switch (argv[0]) 
+			{
+				case 'PRIVMSG':
+					if (msg.match(/kat/i)) this.say(argv[1], "mjau");
+					if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
 					{
-						'date': new Date().toJSON(),
-						'user': user,
-						'host': host,
-						'chan': argv[1],
-						'msg': msg
-					});
-				break;
-
-			case 'JOIN':
-				if (admins.indexOf(user) != - 1) 
-				{
-					self.op(msg.slice(0, msg.length), [user]);
+						this.massdeop = true;
+						this.connection.write("NAMES " + argv[1] + "\r");
+					}
+					if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
+					{
+						this.massop = true;
+						this.connection.write("NAMES " + argv[1] + "\r");
+					}
+					log.push(
+						{
+							'date': new Date().toJSON(),
+							'user': user,
+							'host': host,
+							'chan': argv[1],
+							'msg': msg
+						});
+					break;
+	
+				case 'JOIN':
+					if (admins.indexOf(user) != - 1) 
+					{
+						self.op(msg.slice(0, msg.length), [user]);
+					}
+					break;
+	
+				case '353':
+					if (this.massdeop || this.massop) 
+					{
+						users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
+						if (this.massdeop) 
+					{
+						self.op(argv[3], users, 'deop');
+						this.massdeop = false;
+					}
+					else 
+					{
+						self.op(argv[3], users);
+						this.massop = false;
+					}
 				}
 				break;
-
-			case '353':
-				if (this.massdeop || this.massop) 
-				{
-					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
-					if (this.massdeop) 
-				{
-					self.op(argv[3], users, 'deop');
-					this.massdeop = false;
-				}
-				else 
-				{
-					self.op(argv[3], users);
-					this.massop = false;
-				}
 			}
-			break;
 		}
 	}
-}
 
-this.say = function(channel, something) 
-{
-	this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
-}
-
-this.op = function(channel, somefolks, deop) 
-{
-	var cmd = "MODE " + channel + " ";
-	if (deop) mode = "-";
-	else mode = "+";
-	var users = [];
-	for (i = 0; i < somefolks.length; i++) 
+	this.say = function(channel, something) 
 	{
-		mode += "o";
-		users.push(somefolks[i]);
-		if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) 
+		this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
+	}
+	
+	this.op = function(channel, somefolks, deop) 
+	{
+		var cmd = "MODE " + channel + " ";
+		if (deop) mode = "-";
+		else mode = "+";
+		var users = [];
+		for (i = 0; i < somefolks.length; i++) 
 		{
-			this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
-			while (users.length > 0)
-			users.pop();
-			if (deop) mode = "-";
-			else mode = "+";
+			mode += "o";
+			users.push(somefolks[i]);
+			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) 
+			{
+				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
+				while (users.length > 0)
+				users.pop();
+				if (deop) mode = "-";
+				else mode = "+";
+			}
 		}
 	}
-}
 };
 
 var bot = new bottle();
