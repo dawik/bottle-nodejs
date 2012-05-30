@@ -53,6 +53,7 @@ bottle = function()
 		}
 	});
 
+
 	this.parse = function(input) 
 	{
 		if (input.charAt(0) == ':') 
@@ -114,7 +115,8 @@ bottle = function()
 
 				if (this.massdeop || this.massop) 
 				{
-					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
+					users = msg.slice(0, msg.search(/:/) - 3);
+					users = users.replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
 					if (this.massdeop) 
 					{
 						self.op(argv[3], users, 'deop');
@@ -133,12 +135,10 @@ bottle = function()
 		}
 	}
 
-
 	this.say = function(channel, something) 
 	{
 		this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
 	}
-	
 
 	this.op = function(channel, somefolks, deop) 
 	{
