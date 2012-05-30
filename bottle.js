@@ -115,7 +115,7 @@ bottle = function() {
 		for (i = 0; i < somefolks.length; i++) {
 			mode += "o";
 			users.push(somefolks[i]);
-			if (i > 0 && i % 6 === 0) {
+			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) {
 				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 				while (users.length > 0)
 				users.pop();
@@ -123,7 +123,6 @@ bottle = function() {
 				else mode = "";
 			}
 		}
-		this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 	}
 };
 
