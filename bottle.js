@@ -1,6 +1,6 @@
-/*		bottle v0.1
- *		wikmans@kth.se
- */
+/*  bottle v0.1
+ *  wikmans@kth.se
+*/
 
 var http = require("http");
 var net = require("net");
@@ -106,12 +106,13 @@ stdin.on("keypress", function(chunk, key) {
 		buffer = "";
 	}
 
-	else if (key && key.name == "f3") {
+	if (key && key.name == "f3") {
 		bot.say(channels[0], buffer + "\n");
 		console.log(channels[0] + " <bot> " + buffer);
 		buffer = "";
 	}
 
-	else if (key && key.ctrl && key.name === "p") for (i = 0; i < log.length; i++) console.log(log[i]);
-	else if (key && key.ctrl && key.name === "c") process.exit()
+	if (key && key.ctrl && key.name === "p") for (i = 0; i < log.length; i++) console.log(log[i]);
+	if (key && key.ctrl && key.name === "c") process.exit()
 });
+
