@@ -15,13 +15,14 @@ port = 6667,
 log = [];
 
 bottle = function() 
+
+	self = this;
 {
 	var _ping = new RegExp(/^PING :/),
 	_connected = new RegExp(/^.*MODE.*\+iw$/m),
 
 	irc = this.connection = net.createConnection(port, server),
 
-	self = this;
 
 	this.connection.on("error", function(error) 
 	{
@@ -57,11 +58,13 @@ bottle = function()
 		if (input.charAt(0) == ':') 
 		{
 			prefix = input.slice(1, input.search(/ /) - 1);
+
 			if (prefix.match(/@/)) 
 			{
 				var user = prefix.slice(0, prefix.search(/!/)),
 				host = prefix.slice(prefix.search(/!/) + 1);
 			}
+
 			var msg = input.slice(input.search(/ :/) + 2, input.length - 2),
 			commands = input.slice(input.search(/ /) + 1, input.search(/ :/)),
 			argv = commands.split(" ");
@@ -73,16 +76,19 @@ bottle = function()
 			{
 				case 'PRIVMSG':
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
+
 				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
 				{
 					this.massdeop = true;
 					this.connection.write("NAMES " + argv[1] + "\r");
 				}
+
 				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
 				{
 					this.massop = true;
 					this.connection.write("NAMES " + argv[1] + "\r");
 				}
+
 				log.push(
 					{
 						'date': new Date().toJSON(),
@@ -91,6 +97,7 @@ bottle = function()
 						'chan': argv[1],
 						'msg': msg
 					});
+
 				break;
 
 				case 'JOIN':
@@ -98,6 +105,7 @@ bottle = function()
 				{
 					self.op(msg.slice(0, msg.length), [user]);
 				}
+
 				break;
 
 				case '353':
@@ -109,37 +117,46 @@ bottle = function()
 						self.op(argv[3], users, 'deop');
 						this.massdeop = false;
 					}
+
 					else 
 					{
 						self.op(argv[3], users);
 						this.massop = false;
 					}
 				}
+
 				break;
 			}
 		}
 	}
+
 
 	this.say = function(channel, something) 
 	{
 		this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
 	}
 	
+
 	this.op = function(channel, somefolks, deop) 
 	{
 		var cmd = "MODE " + channel + " ";
+		var users = [];
+
 		if (deop) mode = "-";
 		else mode = "+";
-		var users = [];
+
 		for (i = 0; i < somefolks.length; i++) 
 		{
 			mode += "o";
 			users.push(somefolks[i]);
+
 			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) 
 			{
 				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
+
 				while (users.length > 0)
 				users.pop();
+
 				if (deop) mode = "-";
 				else mode = "+";
 			}
