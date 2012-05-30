@@ -9,7 +9,7 @@ var util = require("util");
 var admins = ["davve"];
 var nick = "bottle";
 var username = "Bottle beta bot";
-var channels = ["#testor", "#testor1"];
+var channels = ["#testor1", "#testor2"];
 var server = "irc.freequest.net";
 var port = 6667;
 
@@ -29,16 +29,24 @@ bottle = function() {
 
 	irc.on("connect", function() {
 		this.write("NICK " + nick + "\n");
-		this.write("USER bottle 8 * : " + username + "\n");
+		this.write("USER bottle 8 * :" + username + "\n");
 	});
 
 	irc.on("data", function(data) {
 		text = data.toString();
+
 		if (_ping.test(text)) this.write(text.replace(/:/g, "") + "\n");
+
+		else if (_connected.test(text)) for (i = 0; i < channels.length; i++) {
+			self.con.write("JOIN " + channels[i] + "\n");
+			self.say(channels[i], "Howdy ho \n");
+		}
+
 		else self.parse(text);
 	});
 
 	this.parse = function(input) {
+
 
 		if (input.charAt(0) == ':') {
 			prefix = input.slice(1, input.search(/ /) - 1);
@@ -53,6 +61,7 @@ bottle = function() {
 			console.log(argv);
 		}
 
+		
 		if (argv) {
 			if (argv[0] == 'PRIVMSG') {
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
@@ -71,16 +80,13 @@ bottle = function() {
 				}
 			}
 
-			else if (argv[0] == '352') { // Who list
+			else if (argv[0] == '352') { // Who list: todo
 				console.log('mjauu');
 			}
 
 		}
 
-		if (_connected.test(input)) for (i = 0; i < channels.length; i++) {
-			self.con.write("JOIN " + channels[i] + "\n");
-			self.say(channels[i], "Howdy ho \n");
-		}
+
 
 		console.log(input);
 	}
