@@ -8,7 +8,7 @@ util = require("util"),
 admins = ["davve"],
 nick = "bottle2",
 username = "Bottle beta bot",
-channels = ["#styrelserummet", "#testor1", "#testor2"],
+channels = ["#testor1", "#testor2"],
 server = "irc.freequest.net",
 port = 6667,
 
@@ -90,14 +90,16 @@ bottle = function() {
 				if (this.takeover || this.massop) {
 					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
 					if (this.takeover) {
-						self.op(channels[0], users, 'deop');
+						self.op(argv[3], users, 'deop');
 						this.takeover = false;
 					}
 					else {
-						self.op(channels[0], users);
+						self.op(argv[3], users);
 						this.massop = false;
 					}
 				}
+				console.log(prefix);
+				console.log(argv[3]);
 				break;
 			}
 		}
