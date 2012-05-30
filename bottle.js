@@ -64,7 +64,7 @@ bottle = function() {
 			case 'PRIVMSG':
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
 				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) {
-					this.takeover = true;
+					this.massdeop = true;
 					this.connection.write("NAMES " + argv[1] + "\r");
 				}
 				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) {
@@ -87,11 +87,11 @@ bottle = function() {
 				break;
 
 			case '353':
-				if (this.takeover || this.massop) {
+				if (this.massdeop || this.massop) {
 					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
-					if (this.takeover) {
+					if (this.massdeop) {
 						self.op(argv[3], users, 'deop');
-						this.takeover = false;
+						this.massdeop = false;
 					}
 					else {
 						self.op(argv[3], users);
