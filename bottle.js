@@ -16,9 +16,9 @@ log = [];
 
 bottle = function() 
 {
-	self = this,
+	var self = this,
 
-	var _ping = new RegExp(/^PING :/),
+	_ping = new RegExp(/^PING :/),
 	_connected = new RegExp(/^.*MODE.*\+iw$/m),
 
 	irc = this.connection = net.createConnection(port, server);
@@ -116,7 +116,8 @@ bottle = function()
 				if (this.massdeop || this.massop) 
 				{
 					users = msg.slice(0, msg.search(/:/) - 3);
-					users = users.replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
+					users = users.replace("\r\n", "").replace(/@/g, "");
+					users = users.replace(/\+/g, "").split(" ");
 					if (this.massdeop) 
 					{
 						self.op(argv[3], users, 'deop');
@@ -155,7 +156,8 @@ bottle = function()
 
 			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) 
 			{
-				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
+				this.connection.write(cmd + mode + " " + 
+				users.join(" ").replace(nick, "") + "\r");
 
 				while (users.length > 0)
 					users.pop();
