@@ -62,49 +62,49 @@ bottle = function()
 				var user = prefix.slice(0, prefix.search(/!/)),
 				host = prefix.slice(prefix.search(/!/) + 1);
 			}
-		var msg = input.slice(input.search(/ :/) + 2, input.length - 2),
-		commands = input.slice(input.search(/ /) + 1, input.search(/ :/)),
-		argv = commands.split(" ");
-	}
+			var msg = input.slice(input.search(/ :/) + 2, input.length - 2),
+			commands = input.slice(input.search(/ /) + 1, input.search(/ :/)),
+			argv = commands.split(" ");
+		}
 
 		if (argv) 
 		{
 			switch (argv[0]) 
 			{
 				case 'PRIVMSG':
-					if (msg.match(/kat/i)) this.say(argv[1], "mjau");
-					if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
+				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
+				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
+				{
+					this.massdeop = true;
+					this.connection.write("NAMES " + argv[1] + "\r");
+				}
+				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
+				{
+					this.massop = true;
+					this.connection.write("NAMES " + argv[1] + "\r");
+				}
+				log.push(
 					{
-						this.massdeop = true;
-						this.connection.write("NAMES " + argv[1] + "\r");
-					}
-					if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
-					{
-						this.massop = true;
-						this.connection.write("NAMES " + argv[1] + "\r");
-					}
-					log.push(
-						{
-							'date': new Date().toJSON(),
-							'user': user,
-							'host': host,
-							'chan': argv[1],
-							'msg': msg
-						});
-					break;
-	
+						'date': new Date().toJSON(),
+						'user': user,
+						'host': host,
+						'chan': argv[1],
+						'msg': msg
+					});
+				break;
+
 				case 'JOIN':
-					if (admins.indexOf(user) != - 1) 
-					{
-						self.op(msg.slice(0, msg.length), [user]);
-					}
-					break;
-	
+				if (admins.indexOf(user) != - 1) 
+				{
+					self.op(msg.slice(0, msg.length), [user]);
+				}
+				break;
+
 				case '353':
-					if (this.massdeop || this.massop) 
-					{
-						users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
-						if (this.massdeop) 
+				if (this.massdeop || this.massop) 
+				{
+					users = msg.slice(0, msg.search(/:/) - 3).replace("\r\n", "").replace(/@/g, "").replace(/\+/g, "").split(" ");
+					if (this.massdeop) 
 					{
 						self.op(argv[3], users, 'deop');
 						this.massdeop = false;
