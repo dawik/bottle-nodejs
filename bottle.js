@@ -98,8 +98,6 @@ bottle = function() {
 						this.massop = false;
 					}
 				}
-				console.log(prefix);
-				console.log(argv[3]);
 				break;
 			}
 		}
