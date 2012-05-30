@@ -110,9 +110,9 @@ bottle = function() {
 	}
 
 	this.op = function(channel, somefolks, deop) {
-		var cmd = "MODE " + channel + " +";
+		var cmd = "MODE " + channel + " ";
 		if (deop) mode = "-";
-		else mode = "";
+		else mode = "+";
 		var users = [];
 		for (i = 0; i < somefolks.length; i++) {
 			mode += "o";
@@ -122,7 +122,7 @@ bottle = function() {
 				while (users.length > 0)
 				users.pop();
 				if (deop) mode = "-";
-				else mode = "";
+				else mode = "+";
 			}
 		}
 	}
