@@ -18,10 +18,8 @@ var log = [];
 bottle = function() {
 	var _ping = new RegExp(/^PING :/)
 	var _connected = new RegExp(/^.*MODE.*\+iw$/m)
-
-	self = this;
-
 	irc = this.con = net.createConnection(port, server);
+	self = this;
 
 	irc.on("error", function(error) {
 		console.log(error)
@@ -38,15 +36,16 @@ bottle = function() {
 		if (_ping.test(text)) this.write(text.replace(/:/g, "") + "\n");
 
 		else if (_connected.test(text)) for (i = 0; i < channels.length; i++) {
-			self.con.write("JOIN " + channels[i] + "\n");
+			this.write("JOIN " + channels[i] + "\n");
 			self.say(channels[i], "Howdy ho \n");
 		}
 
-		else self.parse(text);
+		else {
+			self.parse(text);
+		}
 	});
 
 	this.parse = function(input) {
-
 
 		if (input.charAt(0) == ':') {
 			prefix = input.slice(1, input.search(/ /) - 1);
@@ -61,9 +60,9 @@ bottle = function() {
 			console.log(argv);
 		}
 
-		
 		if (argv) {
-			if (argv[0] == 'PRIVMSG') {
+			switch (argv[0]) {
+			case 'PRIVMSG':
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
 				log.push({
 					'date': new Date().toJSON(),
@@ -72,23 +71,19 @@ bottle = function() {
 					'chan': argv[1],
 					'msg': msg
 				});
-			}
+				break;
 
-			else if (argv[0] == 'JOIN') {
+			case 'JOIN':
 				if (admins.indexOf(user) != - 1) {
 					this.con.write("MODE #" + msg.slice(1, msg.length) + " +o " + user + "\n");
 				}
-			}
+				break;
 
-			else if (argv[0] == '352') { // Who list: todo
-				console.log('mjauu');
+			case '352':
+				break;
 			}
-
+			console.log(input);
 		}
-
-
-
-		console.log(input);
 	}
 
 	this.say = function(channel, something) {
