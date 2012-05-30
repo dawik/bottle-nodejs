@@ -9,7 +9,7 @@ var util = require("util");
 var admins = ["davve"];
 var nick = "bottle";
 var username = "Bottle beta bot";
-var channels = ["#testor", "#testor2"];
+var channels = ["#testor", "#testor1"];
 var server = "irc.freequest.net";
 var port = 6667;
 
@@ -67,7 +67,7 @@ bottle = function() {
 
 			else if (argv[0] == 'JOIN') {
 				if (admins.indexOf(user) != - 1) {
-					this.con.write("MODE #" + msg.slice(1, msg.length - 2) + " +o " + user + "\n");
+					this.con.write("MODE #" + msg.slice(1, msg.length) + " +o " + user + "\n");
 				}
 			}
 
