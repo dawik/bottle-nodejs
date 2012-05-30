@@ -15,9 +15,9 @@ port = 6667,
 log = [];
 
 bottle = function() 
+{
 
 	self = this;
-{
 	var _ping = new RegExp(/^PING :/),
 	_connected = new RegExp(/^.*MODE.*\+iw$/m),
 
