@@ -5,7 +5,7 @@ util = require("util")
 admins = ["davve"]
 nick = "bottle"
 username = "Bottle beta bot"
-channels = ["#testor1", "#testor2"]
+channels = ["#styrelserummet", "#testor1", "#testor2"]
 server = "irc.freequest.net"
 port = 6667
 
@@ -108,7 +108,7 @@ bottle = ->
     				if (deop) mode = "-";
     				else mode = "+";
     			}
-    		}`
+            }`
             return;
         return
         
