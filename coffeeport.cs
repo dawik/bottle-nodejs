@@ -42,8 +42,8 @@ bottle = ->
         else
             self.parse text
         return
+
     @.parse = (input) ->
-        console.log(input);
         if input.charAt 0 == ":"
             prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -54,6 +54,7 @@ bottle = ->
             msg = input.slice (input.search /\ :/) + 2, input.length - 2
             commands = input.slice (input.search /\ /) + 1, input.search /\ :/
             argv = commands.split " "
+
         if argv
             switch argv[0]
                 when "PRIVMSG" 
@@ -71,7 +72,6 @@ bottle = ->
                         self.op (msg.slice 0, msg.length), [ user ]
 
                 when "353"
-                    console.log('teeest');
                     if this.massdeop or this.massop
                         users = msg.slice 0, (msg.search /:/) - 3
                         users = users.replace "\r\n", ""
@@ -111,7 +111,6 @@ bottle = ->
     		}`
             return;
         return
-
         
     return
 
