@@ -43,6 +43,7 @@ bottle = ->
             self.parse text
         return
     @.parse = (input) ->
+        console.log(input);
         if input.charAt 0 == ":"
             prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -58,10 +59,10 @@ bottle = ->
                 when "PRIVMSG" 
                     if msg.match /kat/i 
                         self.say argv[1], "mjau"
-                    if msg.match /gogotakeover/i and admins.indexOf user != -1
+                    if msg.match(/gogotakeover/i) and admins.indexOf(user) != -1
                         @.massdeop = true
                         @.connection.write "NAMES " + argv[1] + "\r"
-                    if msg.match /plzop/i and admins.indexOf user != -1
+                    if msg.match(/plzop/i) and admins.indexOf(user) != -1
                         @.massop = true
                         @.connection.write "NAMES " + argv[1] + "\r"
 
@@ -70,6 +71,7 @@ bottle = ->
                         self.op (msg.slice 0, msg.length), [ user ]
 
                 when "353"
+                    console.log('teeest');
                     if this.massdeop or this.massop
                         users = msg.slice 0, (msg.search /:/) - 3
                         users = users.replace "\r\n", ""

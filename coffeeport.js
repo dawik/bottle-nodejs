@@ -53,6 +53,7 @@
     });
     this.parse = function(input) {
       var argv, commands, host, msg, prefix, user, users;
+      console.log(input);
       if (input.charAt(0 === ":")) {
         prefix = input.slice(1, (input.search(/\ /)) - 1);
         if (prefix.match(/@/)) {
@@ -67,11 +68,11 @@
         switch (argv[0]) {
           case "PRIVMSG":
             if (msg.match(/kat/i)) self.say(argv[1], "mjau");
-            if (msg.match(/gogotakeover/i && admins.indexOf(user !== -1))) {
+            if (msg.match(/gogotakeover/i) && admins.indexOf(user) !== -1) {
               this.massdeop = true;
               this.connection.write("NAMES " + argv[1] + "\r");
             }
-            if (msg.match(/plzop/i && admins.indexOf(user !== -1))) {
+            if (msg.match(/plzop/i) && admins.indexOf(user) !== -1) {
               this.massop = true;
               this.connection.write("NAMES " + argv[1] + "\r");
             }
@@ -82,6 +83,7 @@
             }
             break;
           case "353":
+            console.log('teeest');
             if (this.massdeop || this.massop) {
               users = msg.slice(0, (msg.search(/:/)) - 3);
               users = users.replace("\r\n", "");
