@@ -14,8 +14,7 @@ port = 6667,
 
 log = [];
 
-bottle = function() 
-{
+bottle = function() {
 	var self = this,
 
 	_ping = new RegExp(/^PING :/),
@@ -23,45 +22,35 @@ bottle = function()
 
 	irc = this.connection = net.createConnection(port, server);
 
-
-	this.connection.on("error", function(error) 
-	{
+	this.connection.on("error", function(error) {
 		console.log(error)
 	});
 
-	this.connection.on("connect", function() 
-	{
+	this.connection.on("connect", function() {
 		this.write("NICK " + nick + "\r");
 		this.write("USER bottle 8 * :" + username + "\r");
 	});
 
-	this.connection.on("data", function(data) 
-	{
+	this.connection.on("data", function(data) {
 		var text = data.toString();
 
 		if (_ping.test(text)) this.write(text.replace(/:/g, "") + "\r");
 
-		else if (_connected.test(text)) for (i = 0; i < channels.length; i++) 
-		{
+		else if (_connected.test(text)) for (i = 0; i < channels.length; i++) {
 			this.write("JOIN " + channels[i] + "\r");
 			self.say(channels[i], "Howdy ho \r");
 		}
 
-		else 
-		{
+		else {
 			self.parse(text);
 		}
 	});
 
-
-	this.parse = function(input) 
-	{
-		if (input.charAt(0) == ':') 
-		{
+	this.parse = function(input) {
+		if (input.charAt(0) == ':') {
 			prefix = input.slice(1, input.search(/ /) - 1);
 
-			if (prefix.match(/@/)) 
-			{
+			if (prefix.match(/@/)) {
 				var user = prefix.slice(0, prefix.search(/!/)),
 				host = prefix.slice(prefix.search(/!/) + 1);
 			}
@@ -71,61 +60,52 @@ bottle = function()
 			argv = commands.split(" ");
 		}
 
-		if (argv) 
-		{
-			switch (argv[0]) 
-			{
-				case 'PRIVMSG':
+		if (argv) {
+			switch (argv[0]) {
+			case 'PRIVMSG':
 
 				if (msg.match(/kat/i)) this.say(argv[1], "mjau");
 
-				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) 
-				{
+				if (msg.match(/gogotakeover/i) && admins.indexOf(user) != - 1) {
 					this.massdeop = true;
 					this.connection.write("NAMES " + argv[1] + "\r");
 				}
 
-				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) 
-				{
+				if (msg.match(/plzop/i) && admins.indexOf(user) != - 1) {
 					this.massop = true;
 					this.connection.write("NAMES " + argv[1] + "\r");
 				}
 
-				log.push(
-				{
-						'date': new Date().toJSON(),
-						'user': user,
-						'host': host,
-						'chan': argv[1],
-						'msg': msg
+				log.push({
+					'date': new Date().toJSON(),
+					'user': user,
+					'host': host,
+					'chan': argv[1],
+					'msg': msg
 				});
 
 				break;
 
-				case 'JOIN':
+			case 'JOIN':
 
-				if (admins.indexOf(user) != - 1) 
-				{
+				if (admins.indexOf(user) != - 1) {
 					self.op(msg.slice(0, msg.length), [user]);
 				}
 
 				break;
 
-				case '353':
+			case '353':
 
-				if (this.massdeop || this.massop) 
-				{
+				if (this.massdeop || this.massop) {
 					users = msg.slice(0, msg.search(/:/) - 3);
 					users = users.replace("\r\n", "").replace(/@/g, "");
 					users = users.replace(/\+/g, "").split(" ");
-					if (this.massdeop) 
-					{
+					if (this.massdeop) {
 						self.op(argv[3], users, 'deop');
 						this.massdeop = false;
 					}
 
-					else 
-					{
+					else {
 						self.op(argv[3], users);
 						this.massop = false;
 					}
@@ -136,31 +116,26 @@ bottle = function()
 		}
 	}
 
-	this.say = function(channel, something) 
-	{
+	this.say = function(channel, something) {
 		this.connection.write("PRIVMSG " + channel + " :" + something + "\r");
 	}
 
-	this.op = function(channel, somefolks, deop) 
-	{
+	this.op = function(channel, somefolks, deop) {
 		var cmd = "MODE " + channel + " ";
 		var users = [];
 
 		if (deop) mode = "-";
 		else mode = "+";
 
-		for (i = 0; i < somefolks.length; i++) 
-		{
+		for (i = 0; i < somefolks.length; i++) {
 			mode += "o";
 			users.push(somefolks[i]);
 
-			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) 
-			{
-				this.connection.write(cmd + mode + " " + 
-				users.join(" ").replace(nick, "") + "\r");
+			if (i > 0 && i % 6 === 0 || i === somefolks.length - 1) {
+				this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
 
 				while (users.length > 0)
-					users.pop();
+				users.pop();
 
 				if (deop) mode = "-";
 				else mode = "+";
@@ -175,27 +150,23 @@ var bot = new bottle();
 var buffer = "",
 stdin = process.openStdin();
 require("tty").setRawMode(true);
-stdin.on("keypress", function(chunk, key) 
-{
-	if (chunk) 
-	{
+stdin.on("keypress", function(chunk, key) {
+	if (chunk) {
 		buffer += chunk;
 	}
 
-	if (key && key.name == "enter") 
-	{
+	if (key && key.name == "enter") {
 		bot.connection.write(buffer + "\r");
 		buffer = "";
 	}
 
-	if (key && key.name == "f3") 
-	{
+	if (key && key.name == "f3") {
 		bot.say(channels[0], buffer + "\r");
 		console.log(channels[0] + " <bot> " + buffer);
 		buffer = "";
 	}
 
-if (key && key.ctrl && key.name === "p") for (i = 0; i < log.length; i++) console.log(log[i]);
-if (key && key.ctrl && key.name === "c") process.exit()
+	if (key && key.ctrl && key.name === "p") for (i = 0; i < log.length; i++) console.log(log[i]);
+	if (key && key.ctrl && key.name === "c") process.exit()
 });
 
