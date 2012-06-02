@@ -70,11 +70,11 @@ bottle = ->
 						users = users.replace /\+/g, ""
 						users = users.split " "
 						if @.massdeop
-							self.op argv[3], users, "+o"
+							self.mode argv[3], users, "-o"
 							@.massdeop = false
 
 						else
-							self.op argv[3], users
+							self.mode argv[3], users, "+o"
 							@.massop = false
 
 		@.say = (channel, something) ->
@@ -84,7 +84,7 @@ bottle = ->
 			cmd = "MODE " + channel + " " + flags;
 			users = [ ]
 			`for (i = 0, mode = flags; i < folk.length; i++) {
-				mode += flags.slice 1;
+				mode += flags.slice(1);
 				users.push(folk[i]);
 				if (i > 0 && i % 6 === 0 || folk.length === i + 1) {
 					this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
