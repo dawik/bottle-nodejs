@@ -1,6 +1,4 @@
-http = require("http")
 net = require("net")
-util = require("util")
 
 admins = ["davve"]
 nick = "bottle_beta"
