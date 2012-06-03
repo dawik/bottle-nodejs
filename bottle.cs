@@ -57,9 +57,9 @@ bottle = ->
 					if _me.test trailing
 						cmd = _me.exec trailing
 						cmd_argv = cmd[1].split " "
-						if cmd_argv[0].match(/hi/i) or
-							cmd_argv[0].match(/hey/i) or 
-							cmd_argv[0].match(/hello/i)
+						if trailing.match(/hi/i) or
+							trailing.match(/hey/i) or 
+							trailing.match(/hello/i)
 							self.say irc_argv[1], "hi"
 						else switch cmd_argv[0]
 							when "set"
