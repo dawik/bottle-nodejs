@@ -3,9 +3,9 @@ net = require("net")
 util = require("util")
 
 admins = ["davve"]
-nick = "bottle"
+nick = "bottle_beta"
 username = "Bottle beta bot"
-channels = ["#styrelserummet"]
+channels = ["#testor"]
 server = "irc.freequest.net"
 port = 6667
 
@@ -14,6 +14,7 @@ log = []
 bottle = ->
 	self = @
 
+	_me = new RegExp "^" + nick + ": (.*)"
 	_ping = new RegExp  /^PING\ :/
 	_connected = new RegExp /^.*MODE.*\+iw$/m
 
@@ -35,7 +36,6 @@ bottle = ->
 			for channel in channels
 				do (channel) ->
 					self.connection.write "JOIN " + channel + "\r"
-					self.say channel, "Howdee ho\r"
 		else
 			self.parse text
 
@@ -49,33 +49,40 @@ bottle = ->
 
 			trailing = input.slice (input.search /\ :/) + 2, input.length - 2
 			commands = input.slice (input.search /\ /) + 1, input.search /\ :/
-			argv = commands.split " "
+			irc_argv = commands.split " "
 
-		if argv
-			switch argv[0]
+		if irc_argv
+			switch irc_argv[0]
 				when "PRIVMSG" 
-					if trailing.match(/plzop/i) and admins.indexOf(user) != -1
-						@.massop = true
-						@.connection.write "NAMES " + argv[1] + "\r"
+					if _me.test trailing
+						cmd = _me.exec trailing
+						cmd_argv = cmd[1].split " "
+						if cmd_argv[0].match(/hi/i) or
+							cmd_argv[0].match(/hey/i) or 
+							cmd_argv[0].match(/hello/i)
+							self.say irc_argv[1], "hi"
+						else switch cmd_argv[0]
+							when "set"
+								if admins.indexOf(user) != -1
+									@.massmode = true
+									@.massflag = cmd_argv[1]
+									@.connection.write "NAMES " + irc_argv[1] + "\r"
+							else
+								self.say irc_argv[1], "you want something?\r"
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
 						self.op (trailing.slice 0, trailing.length), [ user ]
 
 				when "353"
-					if this.massdeop or this.massop
+					if @.massmode
 						users = trailing.slice 0, (trailing.search /:/) - 3
 						users = users.replace "\r\n", ""
 						users = users.replace /@/g, ""
 						users = users.replace /\+/g, ""
 						users = users.split " "
-						if @.massdeop
-							self.mode argv[3], users, "-o"
-							@.massdeop = false
-
-						else
-							self.mode argv[3], users, "+o"
-							@.massop = false
+						self.mode irc_argv[3], users, @.massflag
+						@.massmode = false
 
 		@.say = (channel, something) ->
 			@.connection.write "PRIVMSG " + channel + " :" + something + "\r"
