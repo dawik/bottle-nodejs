@@ -59,7 +59,7 @@ bottle = ->
 							when "hey"
 								self.say irc_argv[1], "sup"
 							when "set"
-								if admins.indexOf(user) != -1
+								if admins.indexOf(user) != -1 and cmd_argv[1].length == 2
 									@.massmode = true
 									@.massflag = cmd_argv[1]
 									@.connection.write "NAMES " + irc_argv[1] + "\r"
@@ -68,7 +68,7 @@ bottle = ->
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
-						self.op (trailing.slice 0, trailing.length), [ user ]
+						self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
 
 				when "353"
 					if @.massmode
