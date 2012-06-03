@@ -57,11 +57,9 @@ bottle = ->
 					if _me.test trailing
 						cmd = _me.exec trailing
 						cmd_argv = cmd[1].split " "
-						if trailing.match(/hi/i) or
-							trailing.match(/hey/i) or 
-							trailing.match(/hello/i)
-							self.say irc_argv[1], "hi"
 						else switch cmd_argv[0]
+							when "hey"
+								self.say irc_argv[1], "sup"
 							when "set"
 								if admins.indexOf(user) != -1
 									@.massmode = true
