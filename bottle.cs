@@ -57,7 +57,7 @@ bottle = ->
 					if _me.test trailing
 						cmd = _me.exec trailing
 						cmd_argv = cmd[1].split " "
-						else switch cmd_argv[0]
+						switch cmd_argv[0]
 							when "hey"
 								self.say irc_argv[1], "sup"
 							when "set"
