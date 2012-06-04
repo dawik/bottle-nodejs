@@ -16,7 +16,7 @@ module_example = (argv, input) ->
 	jokes = fs.readFileSync("chuckfacts.txt", "utf8").split("\n")
 
 	if argv and argv[1] > 0 and argv[1] <= jokes.length 
-			number = argv[1]
+		number = argv[1]
 	else
 		number = Math.round(Math.random() * jokes.length)
 	"Chuck norris fact #" + number + ": " + jokes[number]
