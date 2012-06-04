@@ -1,14 +1,17 @@
 net = require("net")
 fs = require("fs")
 
-admins = ["davve"]
-nick = "bottle_peta"
-username = "Bottle beta bot"
-channels = ["#testor"]
-server = "irc.freequest.net"
-port = 6667
-
+networks = new Array
 log = []
+
+# Configuration
+admins = ["davve"]
+nick = "bottle_x"
+username = "Bottle beta bot"
+networks.push { name: "freequest", ip: "bier.de.eu.freequest.net", port: 6667, channels: ["#testor"] }
+networks.push { name: "efnet", ip: "irc.homelien.no", port: 6667, channels: ["#testor"] }
+
+
 
 # Simple module that takes arguments in a vector and returns a formatted string
 # Black box style
@@ -21,36 +24,40 @@ module_example = (argv, input) ->
 		number = Math.round(Math.random() * jokes.length)
 	"Chuck norris fact #" + number + ": " + jokes[number]
 
+
 bottle = ->
 	self = @
 
 	_me = new RegExp "^" + nick + ": (.*)"
 	_ping = new RegExp  /^PING\ :/
-	_connected = new RegExp /^.*MODE.*\+iw$/m
 
 #	Format { hook : function, .. }
 	@.modules = { "chuck" : module_example, "rand" : Math.random }
 
-	irc = @.connection = net.createConnection port, server
+	@.modeset = false
+	@.modeflag = "+o"
 
-	@.connection.on "error", (error) ->
-		console.log error
+	for network in networks
+		network.connection = new net.createConnection network.port, network.ip
+		network.connection.on "error", (error) ->
+			console.log error
+		network.connection.on "connect", ->
+			@.write "NICK " + nick + "\n\r"
+			@.write "USER bottle 0 * :" + username + "\n\r"
+		network.connection.on "data", (data) ->
+			_socket = network.connection;
+			text = data.toString()
+			if _ping.test text
+				@.write text.replace(/:/g, "") + "\n\r"
 
-	@.connection.on "connect", ->
-		@.write "NICK " + nick + "\r"
-		@.write "USER bottle 8 * :" + username + "\r"
-
-	@.connection.on "data", (data) ->
-		text = data.toString()
-		if _ping.test text
-			@.write text.replace(/:/g, "") + "\r"
-
-		if _connected.test text
-			for channel in channels
-				do (channel) ->
-					self.connection.write "JOIN " + channel + "\r"
-		else
-			self.parse text
+			_connected = new RegExp("^:.* 376", "m")
+			if _connected.test text
+				for channel in network.channels
+					@.write "JOIN " + channel + "\n\r"
+			else
+				response = self.parse text
+			if response
+				@.write response + "\n\r"
 
 	@.parse = (input) ->
 		if input.charAt 0 == ":"
@@ -74,47 +81,51 @@ bottle = ->
 
 						switch cmd_argv[0]
 							when "hey"
-								self.say channel, "sup"
+								return self.say channel, "sup"
 							when "set"
 								if admins.indexOf(user) != -1 and cmd_argv[1].length == 2
-									@.modeset = true
-									@.modeflag = cmd_argv[1]
-									@.connection.write "NAMES " + channel + "\r"
+									self.modeset = true
+									self.modeflag = cmd_argv[1]
+									return "NAMES " + channel
 							else
 								for hook,fn of self.modules
 									if cmd_argv[0] == hook
-										self.say channel, fn(cmd_argv, trailing)
+										return self.say channel, fn(cmd_argv, trailing)
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
-						self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
+						return self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
 
 				when "353"
 					if @.modeset
-						users = trailing.slice 0, (trailing.search /:/) - 3
-						users = users.replace "\r\n", ""
-						users = users.replace /@/g, ""
+						users = trailing.replace /@/g, ""
 						users = users.replace /\+/g, ""
+						users = users.replace "\n\r", ""
 						users = users.split " "
-						self.mode irc_argv[3], users, @.modeflag
-						@.modeset = false
+						self.modeset = false
+						return self.mode irc_argv[3], users, self.modeflag
+
+				when "376"
+					console.log "eomtd\n"
 
 		@.say = (channel, something) ->
-			@.connection.write "PRIVMSG " + channel + " :" + something + "\r"
+			"PRIVMSG " + channel + " :" + something
 
 		@.mode = (channel, folk, flags) ->
+			str = ""
 			cmd = "MODE " + channel + " " + flags;
 			users = [ ]
 			`for (i = 0, mode = flags; i < folk.length; i++) {
 				mode += flags.slice(1);
 				users.push(folk[i]);
 				if (i > 0 && i % 6 === 0 || folk.length === i + 1) {
-					this.connection.write(cmd + mode + " " + users.join(" ").replace(nick, "") + "\r");
+					str += cmd + mode + " " + users.join(" ").replace(nick, "") + "\r";
 					while (users.length > 0)
 						users.pop();
 					mode = flags;
 				}
 			}`
-			return
+			str
+		return
 
 bot = new bottle
