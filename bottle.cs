@@ -2,7 +2,7 @@ net = require("net")
 fs = require("fs")
 
 admins = ["davve"]
-nick = "bottle_beta"
+nick = "bottle_peta"
 username = "Bottle beta bot"
 channels = ["#testor"]
 server = "irc.freequest.net"
@@ -28,6 +28,7 @@ bottle = ->
 	_ping = new RegExp  /^PING\ :/
 	_connected = new RegExp /^.*MODE.*\+iw$/m
 
+#	Format { hook : function, .. }
 	@.modules = { "chuck" : module_example, "rand" : Math.random }
 
 	irc = @.connection = net.createConnection port, server
@@ -62,6 +63,7 @@ bottle = ->
 			trailing = input.slice (input.search /\ :/) + 2, input.length - 2
 			commands = input.slice (input.search /\ /) + 1, input.search /\ :/
 			irc_argv = commands.split " "
+			channel = irc_argv[1]
 
 		if irc_argv
 			switch irc_argv[0]
@@ -72,30 +74,30 @@ bottle = ->
 
 						switch cmd_argv[0]
 							when "hey"
-								self.say irc_argv[1], "sup"
+								self.say channel, "sup"
 							when "set"
 								if admins.indexOf(user) != -1 and cmd_argv[1].length == 2
-									@.massmode = true
-									@.massflag = cmd_argv[1]
-									@.connection.write "NAMES " + irc_argv[1] + "\r"
+									@.modeset = true
+									@.modeflag = cmd_argv[1]
+									@.connection.write "NAMES " + channel + "\r"
 							else
 								for hook,fn of self.modules
 									if cmd_argv[0] == hook
-										self.say irc_argv[1], fn(cmd_argv, trailing)
+										self.say channel, fn(cmd_argv, trailing)
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
 						self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
 
 				when "353"
-					if @.massmode
+					if @.modeset
 						users = trailing.slice 0, (trailing.search /:/) - 3
 						users = users.replace "\r\n", ""
 						users = users.replace /@/g, ""
 						users = users.replace /\+/g, ""
 						users = users.split " "
-						self.mode irc_argv[3], users, @.massflag
-						@.massmode = false
+						self.mode irc_argv[3], users, @.modeflag
+						@.modeset = false
 
 		@.say = (channel, something) ->
 			@.connection.write "PRIVMSG " + channel + " :" + something + "\r"
