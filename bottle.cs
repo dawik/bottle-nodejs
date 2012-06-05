@@ -1,5 +1,6 @@
 net = require("net")
 fs = require("fs")
+dns = require("dns")
 
 networks = new Array
 log = []
@@ -8,12 +9,11 @@ log = []
 admins = ["davve"]
 nick = "bottle_x"
 username = "Bottle beta bot"
-networks.push { name: "freequest", ip: "bier.de.eu.freequest.net", port: 6667, channels: ["#testor"] }
-networks.push { name: "efnet", ip: "irc.homelien.no", port: 6667, channels: ["#testor"] }
+networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
+		{ "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
 
 
-
-# Simple module that takes arguments in a vector and returns a formatted string
+# Simple module ((function)) that takes arguments in a vector and returns a formatted string
 # Black box style
 module_example = (argv, input) ->
 	jokes = fs.readFileSync("chuckfacts.txt", "utf8").split("\n")
@@ -37,29 +37,33 @@ bottle = ->
 	@.modeset = false
 	@.modeflag = "+o"
 
-	for network in networks
-		network.connection = new net.createConnection network.port, network.ip
+	_net = new Array
+
+	for network,i in networks
+		_net.push i
+
+		socket = network.connection = new net.createConnection network.port, network.address
+
 		network.connection.on "error", (error) ->
 			console.log error
+
 		network.connection.on "connect", ->
 			@.write "NICK " + nick + "\n\r"
 			@.write "USER bottle 0 * :" + username + "\n\r"
+			for chan in networks[_net.pop()].channels
+				@.write "JOIN " + chan + "\n\r"
+
 		network.connection.on "data", (data) ->
-			_socket = network.connection;
+			socket = this;
 			text = data.toString()
 			if _ping.test text
 				@.write text.replace(/:/g, "") + "\n\r"
-
-			_connected = new RegExp("^:.* 376", "m")
-			if _connected.test text
-				for channel in network.channels
-					@.write "JOIN " + channel + "\n\r"
 			else
-				response = self.parse text
+				response = self.parse text, socket
 			if response
 				@.write response + "\n\r"
 
-	@.parse = (input) ->
+	@.parse = (input, socket) ->
 		if input.charAt 0 == ":"
 			prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -104,9 +108,6 @@ bottle = ->
 						users = users.split " "
 						self.modeset = false
 						return self.mode irc_argv[3], users, self.modeflag
-
-				when "376"
-					console.log "eomtd\n"
 
 		@.say = (channel, something) ->
 			"PRIVMSG " + channel + " :" + something
