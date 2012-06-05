@@ -53,8 +53,8 @@ bottle = ->
 				@.write "JOIN " + chan + "\n\r"
 
 		network.connection.on "data", (data) ->
-			socket = this;
 			text = data.toString()
+
 			if _ping.test text
 				@.write text.replace(/:/g, "") + "\n\r"
 			else
