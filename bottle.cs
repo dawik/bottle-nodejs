@@ -2,7 +2,6 @@ net = require("net")
 fs = require("fs")
 dns = require("dns")
 
-networks = new Array
 log = []
 
 # Configuration
