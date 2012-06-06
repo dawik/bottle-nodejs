@@ -84,6 +84,8 @@ bottle = ->
 				when "JOIN"
 					if admins.indexOf(user) != -1
 						return self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
+					else
+						return self.mode (trailing.slice 0, trailing.length), [ user ], "+v"
 
 		return
 
