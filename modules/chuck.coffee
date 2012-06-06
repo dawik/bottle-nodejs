@@ -1,7 +1,7 @@
 # No bot without a chuck norris module.
 module.exports = (argv, requestHook) ->
 	if requestHook
-		# Your hook here
+		# Your hook here. Remember to add it to load.coffee
 		return "chuck"
 
 	fs = require("fs")

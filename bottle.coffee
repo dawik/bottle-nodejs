@@ -36,7 +36,6 @@ bottle = ->
 
 		network.connection.on "data", (data) ->
 			text = data.toString()
-
 			if _ping.test text
 				@.write text.replace(/:/g, "") + "\n\r"
 			else
@@ -48,9 +47,10 @@ bottle = ->
 		"PRIVMSG " + channel + " :" + something
 
 	@.mode = (channel, user, flag) ->
-		"MODE #" + channel + " " + user + " " + flag + "\n\r"
+		"MODE " + channel + " " + flag + " " + user + "\n\r"
 
 	@.parse = (input, socket) ->
+		console.log input
 		if input.charAt 0 == ":"
 			prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -75,11 +75,11 @@ bottle = ->
 							when "mode"
 								return self.mode channel, cmd_argv[1], cmd_argv[2]
 							when "say"
-								return self.say channel, cmd
+								return self.say channel, cmd_argv.slice(1).join(" ")
 							else
-								for hook,fn of self.modules
+								for hook,funktion of self.modules
 									if cmd_argv[0] == hook
-										return self.say channel, fn(cmd_argv)
+										return self.say channel, funktion(cmd_argv)
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
