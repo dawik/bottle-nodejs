@@ -16,7 +16,7 @@ bottle = ->
 	_me = new RegExp "^" + nick + ": (.*)"
 	_ping = new RegExp  /^PING\ :/
 
-	@.modules = modules.hash()
+	@.modules = modules
 
 	_net = new Array
 
