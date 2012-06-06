@@ -48,7 +48,7 @@ bottle = ->
 		"PRIVMSG " + channel + " :" + something
 
 	@.mode = (channel, user, flag) ->
-        "MODE #" + channel + " " + user + " " + flag + "\n\r"
+		"MODE #" + channel + " " + user + " " + flag + "\n\r"
 
 	@.parse = (input, socket) ->
 		if input.charAt 0 == ":"
