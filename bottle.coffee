@@ -4,7 +4,7 @@ modules = require("./modules/load")
 
 # Configuration
 admins = ["davve"]
-nick = "bottle_e"
+nick = "bottle_x"
 username = "Bottle beta bot"
 networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
 { "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]

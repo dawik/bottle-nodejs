@@ -6,5 +6,5 @@ modules.push require("./chuck")
 module.exports = do ->
 	hash = {}
 	for module in modules
-		hash[module ["foo"], "bar"] = module 
+		hash[module] = module 
 	return hash

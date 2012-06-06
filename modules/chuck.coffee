@@ -1,7 +1,6 @@
 # No bot without a chuck norris module.
-module.exports = (argv, requestHook) ->
-	if requestHook
-		# Your hook here. Remember to add it to load.coffee
+module.exports = (argv) ->
+	if not argv
 		return "chuck"
 
 	fs = require("fs")
@@ -12,4 +11,3 @@ module.exports = (argv, requestHook) ->
 	else
 		number = Math.round(Math.random() * facts.length)
 	"Chuck norris fact #" + number + ": " + facts[number]
-
