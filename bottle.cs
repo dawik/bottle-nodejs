@@ -1,27 +1,16 @@
 net = require("net")
 fs = require("fs")
 dns = require("dns")
+example_module = require("./modules/module_example")
 
 log = []
 
 # Configuration
 admins = ["davve"]
-nick = "bottle_x"
+nick = "bottle_e"
 username = "Bottle beta bot"
 networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
 		{ "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
-
-
-# Simple module ((function)) that takes arguments in a vector and returns a formatted string
-# Black box style
-module_example = (argv, input) ->
-	jokes = fs.readFileSync("chuckfacts.txt", "utf8").split("\n")
-
-	if argv and argv[1] > 0 and argv[1] <= jokes.length 
-		number = argv[1]
-	else
-		number = Math.round(Math.random() * jokes.length)
-	"Chuck norris fact #" + number + ": " + jokes[number]
 
 
 bottle = ->
@@ -31,7 +20,7 @@ bottle = ->
 	_ping = new RegExp  /^PING\ :/
 
 #	Format { hook : function, .. }
-	@.modules = { "chuck" : module_example, "rand" : Math.random }
+	@.modules = { "chuck" : example_module.module_example, "rand" : Math.random }
 
 	@.modeset = false
 	@.modeflag = "+o"
@@ -93,7 +82,7 @@ bottle = ->
 							else
 								for hook,fn of self.modules
 									if cmd_argv[0] == hook
-										return self.say channel, fn(cmd_argv, trailing)
+										return self.say channel, fn(cmd_argv)
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
