@@ -5,5 +5,3 @@ A cross-network IRC bot compliant with RFC 2812 running on nodejs platform.
 http://www.irchelp.org/irchelp/rfc/rfc2812.txt
 
 Todo:
-* Runtime load/evaluation of modules
-* External configuration file
