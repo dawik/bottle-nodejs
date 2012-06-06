@@ -1,16 +1,13 @@
+require("coffee-script")
 net = require("net")
-fs = require("fs")
-dns = require("dns")
-example_module = require("./modules/module_example")
-
-log = []
+modules = require("./modules/load")
 
 # Configuration
 admins = ["davve"]
 nick = "bottle_e"
 username = "Bottle beta bot"
 networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
-		{ "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
+{ "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
 
 
 bottle = ->
@@ -19,11 +16,7 @@ bottle = ->
 	_me = new RegExp "^" + nick + ": (.*)"
 	_ping = new RegExp  /^PING\ :/
 
-#	Format { hook : function, .. }
-	@.modules = { "chuck" : example_module.module_example, "rand" : Math.random }
-
-	@.modeset = false
-	@.modeflag = "+o"
+	@.modules = modules.hash()
 
 	_net = new Array
 
@@ -51,6 +44,12 @@ bottle = ->
 			if response
 				@.write response + "\n\r"
 
+	@.say = (channel, something) ->
+		"PRIVMSG " + channel + " :" + something
+
+	@.mode = (channel, user, flag) ->
+        "MODE #" + channel + " " + user + " " + flag + "\n\r"
+
 	@.parse = (input, socket) ->
 		if input.charAt 0 == ":"
 			prefix = input.slice 1, (input.search /\ /) - 1
@@ -70,15 +69,13 @@ bottle = ->
 					if _me.test trailing
 						cmd = _me.exec trailing
 						cmd_argv = cmd[1].split " "
-
 						switch cmd_argv[0]
 							when "hey"
-								return self.say channel, "sup"
-							when "set"
-								if admins.indexOf(user) != -1 and cmd_argv[1].length == 2
-									self.modeset = true
-									self.modeflag = cmd_argv[1]
-									return "NAMES " + channel
+							    return self.say channel, "sup"
+							when "mode"
+								return self.mode channel, cmd_argv[1], cmd_argv[2]
+							when "say"
+								return self.say channel, cmd
 							else
 								for hook,fn of self.modules
 									if cmd_argv[0] == hook
@@ -88,33 +85,6 @@ bottle = ->
 					if admins.indexOf(user) != -1
 						return self.mode (trailing.slice 0, trailing.length), [ user ], "+o"
 
-				when "353"
-					if @.modeset
-						users = trailing.replace /@/g, ""
-						users = users.replace /\+/g, ""
-						users = users.replace "\n\r", ""
-						users = users.split " "
-						self.modeset = false
-						return self.mode irc_argv[3], users, self.modeflag
-
-		@.say = (channel, something) ->
-			"PRIVMSG " + channel + " :" + something
-
-		@.mode = (channel, folk, flags) ->
-			str = ""
-			cmd = "MODE " + channel + " " + flags;
-			users = [ ]
-			`for (i = 0, mode = flags; i < folk.length; i++) {
-				mode += flags.slice(1);
-				users.push(folk[i]);
-				if (i > 0 && i % 6 === 0 || folk.length === i + 1) {
-					str += cmd + mode + " " + users.join(" ").replace(nick, "") + "\r";
-					while (users.length > 0)
-						users.pop();
-					mode = flags;
-				}
-			}`
-			str
 		return
 
 bot = new bottle

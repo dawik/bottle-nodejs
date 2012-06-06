@@ -1,10 +1,10 @@
-# Simple module ((function)) that takes arguments in a vector and returns a formatted string
-# Define 
-fs = require("fs")
-module.exports.module_example = (argv, requestHook) ->
+# No bot without a chuck norris module.
+module.exports = (argv, requestHook) ->
 	if requestHook
+		# Your hook here
 		return "chuck"
 
+	fs = require("fs")
 	facts = fs.readFileSync("./lol/chuckfacts.txt", "utf8").split("\n")
 
 	if argv and argv[1] > 0 and argv[1] <= facts.length 
