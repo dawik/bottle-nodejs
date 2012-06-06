@@ -10,7 +10,7 @@ networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": 
 { "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
 
 
-bottle = ->
+bottle = do ->
 	self = @
 
 	_me = new RegExp "^" + nick + ": (.*)"
@@ -89,4 +89,3 @@ bottle = ->
 
 		return
 
-bot = new bottle

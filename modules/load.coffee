@@ -1,10 +1,11 @@
 modules = new Array
-# Your module loaded here ;-P
+
+# load module like this
 modules.push require("./chuck")
 
-#Hook to function hashmap
+# hook:function hash
 module.exports = do ->
 	hash = {}
 	for module in modules
-		hash[module] = module 
+		hash[module()] = module 
 	return hash
