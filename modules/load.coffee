@@ -1,3 +1,4 @@
+modules = new Array
 # Your module loaded here ;-P
 modules.push require("./chuck")
 
