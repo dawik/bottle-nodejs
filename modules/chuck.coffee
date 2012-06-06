@@ -1,13 +1,15 @@
-# No bot without a chuck norris module.
+# No bot without Chuck Norris!
 module.exports = (argv) ->
 	if not argv
 		return "chuck"
+		
+	fact = do ->
+		fs = require("fs")
+		fs.readFileSync("./lol/chuckfacts.txt", "utf8").split("\n")
 
-	fs = require("fs")
-	facts = fs.readFileSync("./lol/chuckfacts.txt", "utf8").split("\n")
-
-	if argv and argv[1] > 0 and argv[1] <= facts.length 
-		number = argv[1]
+	if argv[1] > 0 and argv[1] <= fact.length 
+		number = argv[1] - 1
 	else
-		number = Math.round(Math.random() * facts.length)
-	"Chuck norris fact #" + number + ": " + facts[number]
+		number = Math.round(Math.random() * fact.length)
+
+	"Chuck norris fact #" + number + ": " + fact[number]

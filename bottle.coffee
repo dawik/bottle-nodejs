@@ -4,7 +4,7 @@ modules = require("./modules/load")
 
 # Configuration
 admins = ["davve"]
-nick = "bottle_x"
+nick = "bottle_z"
 username = "Bottle beta bot"
 networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
 { "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
@@ -13,7 +13,7 @@ networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": 
 bottle = do ->
 	self = @
 
-	_me = new RegExp "^" + nick + ": (.*)"
+	_instruction = new RegExp "^" + nick + ": (.*)"
 	_ping = new RegExp  /^PING\ :/
 
 	@.modules = modules
@@ -59,18 +59,18 @@ bottle = do ->
 				host = prefix.slice (prefix.search /!/) + 1
 
 			trailing = input.slice (input.search /\ :/) + 2, input.length - 2
-			commands = input.slice (input.search /\ /) + 1, input.search /\ :/
-			irc_argv = commands.split " "
+			arguments = input.slice (input.search /\ /) + 1, input.search /\ :/
+			irc_argv = arguments.split " "
 			channel = irc_argv[1]
 
 		if irc_argv
 			switch irc_argv[0]
 				when "PRIVMSG" 
-					if _me.test trailing
-						cmd = _me.exec trailing
-						cmd_argv = cmd[1].split " "
+					if _instruction.test trailing
+						instructions = _instruction.exec trailing
+						cmd_argv = instructions[1].split " "
 						switch cmd_argv[0]
-							when "hey"
+							when "hello"
 							    return self.say channel, "sup"
 							when "mode"
 								return self.mode channel, cmd_argv[1], cmd_argv[2]
@@ -80,6 +80,7 @@ bottle = do ->
 								for hook,funktion of self.modules
 									if cmd_argv[0] == hook
 										return self.say channel, funktion(cmd_argv)
+								return self.say channel, "wat?"
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
