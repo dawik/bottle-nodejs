@@ -79,7 +79,7 @@ bottle = do ->
 								return self.say channel, cmd_argv.slice(1).join(" ")
 							else
 								for hook,module of self.modules
-									if cmd_argv[0] == hook
+									if cmd_argv[0] == hook and admins.indexOf(user) != -1
 										module_response = module(cmd_argv, channel,socket) 
 										if (module_response)
 											is_formated = module_response.match /^PRIVMSG.*/i
