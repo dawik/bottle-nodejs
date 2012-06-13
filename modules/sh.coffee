@@ -9,7 +9,6 @@ module.exports = (argv, channel, socket) ->
 	argv = argv.slice 1
 	
 	send = (text) ->
-		console.log text
 		self.sock.write "PRIVMSG " + channel + " :" + text + "\n\r"
 	
 	parse = (data) ->
