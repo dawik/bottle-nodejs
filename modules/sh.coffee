@@ -18,7 +18,7 @@ module.exports = (argv, channel, socket) ->
 				if line != undefined and line.length > 0 
 					setTimeout send, (i+1) * 1000, line
 			else 
-				send "linecap reached (" + i + ")"
+		send "linecap reached (" + i + ")"
 				return
 
 	do ->

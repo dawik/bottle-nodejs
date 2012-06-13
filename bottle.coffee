@@ -6,7 +6,8 @@ modules = require("./modules/load")
 admins = ["davve"]
 nick = "bottle_sh"
 username = "Bottle beta bot"
-networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] } ]
+networks = [ { "name" : "freequest", "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
+	{ "name" : "efnet", "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
 
 
 bottle = do ->
@@ -22,7 +23,7 @@ bottle = do ->
 	for network,i in networks
 		_net.push i
 
-		socket = network.connection = new net.createConnection network.port, network.address
+		network.connection = new net.createConnection network.port, network.address
 
 		network.connection.on "error", (error) ->
 			console.log error
@@ -38,9 +39,10 @@ bottle = do ->
 			if _ping.test text
 				@.write text.replace(/:/g, "") + "\n\r"
 			else
-				response = self.parse text, socket
+				response = self.parse text, @
 			if response 
 				@.write response + "\n\r"
+		
 
 	@.say = (channel, something) ->
 		"PRIVMSG " + channel + " :" + something
@@ -49,7 +51,7 @@ bottle = do ->
 		"MODE " + channel + " " + flag + " " + user + "\n\r"
 
 	@.parse = (input, socket) ->
-		#console.log input
+		console.log input
 		if input.charAt 0 == ":"
 			prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -78,13 +80,14 @@ bottle = do ->
 							else
 								for hook,module of self.modules
 									if cmd_argv[0] == hook
-										module_response = module(cmd_argv, channel, socket)
-										if module_response and not module_response.match /^privmsg/i
+										module_response = module(cmd_argv, channel,socket) 
+										if (module_response)
+											is_formated = module_response.match /^PRIVMSG.*/i
+										if module_response and is_formated
 											return module_response
 										else if module_response != undefined
-											return self.say module_response
-
-								return self.say self.modules["default"]
+											return self.say channel, module_response
+										else return
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
