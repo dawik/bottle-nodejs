@@ -4,10 +4,9 @@ modules = require("./modules/load")
 
 # Configuration
 admins = ["davve"]
-nick = "bottle_z"
+nick = "bottle_sh"
 username = "Bottle beta bot"
-networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] },
-{ "address": "irc.homelien.no", "port": 6667, "channels": ["#testorefnet"] } ]
+networks = [ { "address": "bier.de.eu.freequest.net", "port": 6667, "channels": ["#testorfq"] } ]
 
 
 bottle = do ->
@@ -40,7 +39,7 @@ bottle = do ->
 				@.write text.replace(/:/g, "") + "\n\r"
 			else
 				response = self.parse text, socket
-			if response
+			if response 
 				@.write response + "\n\r"
 
 	@.say = (channel, something) ->
@@ -50,7 +49,7 @@ bottle = do ->
 		"MODE " + channel + " " + flag + " " + user + "\n\r"
 
 	@.parse = (input, socket) ->
-		console.log input
+		#console.log input
 		if input.charAt 0 == ":"
 			prefix = input.slice 1, (input.search /\ /) - 1
 
@@ -59,8 +58,8 @@ bottle = do ->
 				host = prefix.slice (prefix.search /!/) + 1
 
 			trailing = input.slice (input.search /\ :/) + 2, input.length - 2
-			arguments = input.slice (input.search /\ /) + 1, input.search /\ :/
-			irc_argv = arguments.split " "
+			args = input.slice (input.search /\ /) + 1, input.search /\ :/
+			irc_argv = args.split " "
 			channel = irc_argv[1]
 
 		if irc_argv
@@ -77,10 +76,15 @@ bottle = do ->
 							when "say"
 								return self.say channel, cmd_argv.slice(1).join(" ")
 							else
-								for hook,funktion of self.modules
+								for hook,module of self.modules
 									if cmd_argv[0] == hook
-										return self.say channel, funktion(cmd_argv)
-								return self.say channel, "wat?"
+										module_response = module(cmd_argv, channel, socket)
+										if module_response and not module_response.match /^privmsg/i
+											return module_response
+										else if module_response != undefined
+											return self.say module_response
+
+								return self.say self.modules["default"]
 
 				when "JOIN"
 					if admins.indexOf(user) != -1
